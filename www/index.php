@@ -43,9 +43,9 @@ echo $contents; } ?>
 
 <!-- end of project description -->
 
-<p> Welcome to the bootfs project. </p>
 
-<p> The <strong>project summary page</strong> you can find <a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name; ?>/"><strong>here</strong></a>. </p>
+<p> The <strong>project summary page</strong> you can find <a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name; ?>/"><strong>here</strong></a>.
+Also visit Christian Bender's homepage for more information on the <a href="http://www.christianbender.org">author</a>. </p>
 
 </body>
 </html>
