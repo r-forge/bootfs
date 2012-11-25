@@ -1,5 +1,5 @@
 
-makeIG <- function(res_bstr, SUBDIR=NULL) {
+makeIG <- function(res_bstr, SUBDIR=NULL, prob=.9) {
 	if(!is.null(SUBDIR)) {
 		pdf(paste(SUBDIR, "importance_graph.pdf", sep="/"), width=25, height=25)
 	}
@@ -27,12 +27,12 @@ makeIG <- function(res_bstr, SUBDIR=NULL) {
 		## order
 		ord <- order(rownames(adj))
 		adj2 <- adj[ord,ord]
-		filter <- min((max(adj2)-1),round(quantile(adj2, prob=.9))) # only show the 10%  most frequent occuring edges
+		filter <- min((max(adj2)-1),round(quantile(adj2, prob=prob))) # only show the 10%  most frequent occuring edges
 		#importance_igraph(detailed.to.simple.regulations(adj2), weights=adj2, main=strat, layout="layout.ellipsis", vlabel.cex=3, filter=filter)
 		importance_igraph(adj2, main=strat, layout="layout.ellipsis", vlabel.cex=3, filter=filter)
 	}
 	if(!is.null(SUBDIR)) {
 		dev.off()
 	}
-	list(allsignatures=allsignatures, allprots=allprots, adj=adj)
+	list(allsignatures=allsignatures, allprots=allprots, adj=adj, filter=filter)
 }

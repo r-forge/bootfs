@@ -9,7 +9,7 @@ the final feature ranking is shown as egg-shaped graph using this
 function.
 }
 \usage{
-makeIG(res_bstr, SUBDIR=NULL)
+makeIG(res_bstr, SUBDIR=NULL, prob=.9)
 }
 \arguments{
   \item{res_bstr}{
@@ -18,6 +18,9 @@ makeIG(res_bstr, SUBDIR=NULL)
   \item{SUBDIR}{
 	Where to store the output. If NULL, the importance graph is plotted 
 	to the standard plotting device.
+}
+  \item{prob}{
+	Quantile in [0,1], defines the cutoff, at which frequency of cooccuring features an edge will be drawn between the two features in the importance graph.
 }
 }
 \details{

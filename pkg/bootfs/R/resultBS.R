@@ -31,7 +31,8 @@ resultBS <- function(results, DIR=".", vlabel.cex=3, filter=10, saveres=TRUE) {
     ord <- order(rownames(adj))
     adj2 <- adj[ord,ord]
     #importance_igraph(detailed.to.simple.regulations(adj2), weights=adj2, main=strat, layout="layout.ellipsis", vlabel.cex=3, filter=filter, ewprop=3)
-    importance_igraph(adj2, main=strat, layout="layout.ellipsis", vlabel.cex=3, filter=filter, ewprop=3)
+    importance_igraph(adj2, main=strat, layout="layout.ellipsis", vlabel.cex=vlabel.cex, filter=filter, ewprop=3)
+    adjret <- adj2
  	oo <- order(diag(adj2),decreasing=TRUE)
 	adj2 <- adj2[oo,oo]
 	tophits <- cbind(names(diag(adj2)), diag(adj2))
@@ -43,5 +44,5 @@ resultBS <- function(results, DIR=".", vlabel.cex=3, filter=10, saveres=TRUE) {
 		write.csv2(tophits, file=paste(DIR, "tophits.csv", sep="/"))
 	}
 	
-	list(allsignatures=allsignatures, allprots=allprots, adj=adj2, tophits=tophits)
+	list(allsignatures=allsignatures, allprots=allprots, adj=adjret, tophits=tophits)
 }
