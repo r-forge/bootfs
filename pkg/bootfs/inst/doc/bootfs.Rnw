@@ -58,7 +58,7 @@ This document describes the package 'bootfs' for robust feature selection in cla
 
 This section contains the basic steps for analysis of high-throughput data, consisting of a number of samples to classify (such as patients) and a number of features, such as genes or proteins. Samples originate in two sample groups, for instance healthy versus sick patients. The aim is to find the most important features discriminating the two classes of patients.
 
-The usage of the package is illustrated for three classification algorithms: PAMR (Prediction analysis for Microarrays), RF-Boruta (Random forests with the Boruta algorithm for feature selection) and SCAD-SVM (Support Vector Machines with Smoothly Clipped Absolute Deviation feature selection). First of all load the package:
+The usage of the package is illustrated for three classification algorithms: PAMR (Prediction analysis for Microarrays, \cite{Tibshirani2002}), RF-Boruta (Random forests with the Boruta algorithm for feature selection, \cite{Kursa2010}) and SCAD-SVM (Support Vector Machines with Smoothly Clipped Absolute Deviation feature selection, \cite{Zhang2006}, implementation from \cite{Becker2011}). First of all load the package:
 
 %% chunk 1
 <<label=Load_package,echo=FALSE, eval=FALSE>>=
@@ -222,8 +222,8 @@ The version number of R and packages loaded for generating the vignette were:
 toLatex(sessionInfo())
 @
 
-%\bibliographystyle{plain}  % Style BST file
-%\bibliography{references}     % Bibliography file (usually '*.bib' ) 
+\bibliographystyle{plain}  % Style BST file
+\bibliography{references}     % Bibliography file (usually '*.bib' ) 
 \end{document}
 
 %
