@@ -58,21 +58,16 @@ This document describes the package 'bootfs' for robust feature selection in cla
 
 This section contains the basic steps for analysis of high-throughput data, consisting of a number of samples to classify (such as patients) and a number of features, such as genes or proteins. Samples originate in two sample groups, for instance healthy versus sick patients. The aim is to find the most important features discriminating the two classes of patients.
 
-The usage of the package is illustrated for three classification algorithms: PAMR (Prediction analysis for Microarrays, \cite{Tibshirani2002}), RF-Boruta (Random forests with the Boruta algorithm for feature selection, \cite{Kursa2010}) and SCAD-SVM (Support Vector Machines with Smoothly Clipped Absolute Deviation feature selection, \cite{Zhang2006}, implementation from \cite{Becker2011}). First of all load the package:
+The usage of the package is illustrated for three classification algorithms: \emph{pamr} (Prediction analysis for Microarrays, \cite{Tibshirani2002}, implementation in \emph{pamr}-R-package), \emph{rf\_boruta} (Random forests with the Boruta algorithm for feature selection, \cite{Kursa2010}, implementation in \emph{Boruta}-R-package) and \emph{scad} (Support Vector Machines with Smoothly Clipped Absolute Deviation feature selection, \cite{Zhang2006}, implementation in the \emph{penalizedSVM} R-package \cite{Becker2011}). Also available feature selection methods (through \emph{penalizedSVM} package) are \emph{1norm} for L1-penalisation (LASSO), \emph{scad+L2} for Elastic-SCAD  and \emph{DrHSVM} for Elastic Net. First of all load the package:
 
 %% chunk 1
-<<label=Load_package,echo=FALSE, eval=FALSE>>=
+<<label=Loadpackage, echo=TRUE, eval=FALSE>>=
 library(bootfs)
 @
 
-For illustration purpose, some data can be simulated:
 
 \subsection{Simulating data}
-In this section we show how to generate artificial networks and data. A reference
-signalling network is simulated and used to sample measurements that incorporate
-the network structure.
-
-First, simulate a network with 6 nodes and 2 distinct input stimuli. 
+Data can be simulated using a built in function \emph{simDataSet}. This samples a data matrix with \emph{nsam} samples and \emph{ngen} genes, as well as a grouping vector defining two sample groups.
 
 <<SimulateNetwork, eval=FALSE>>=
 set.seed(1234)
@@ -83,7 +78,7 @@ groupings <- data$groupings
 
 \subsection{Assessing performance of the classifiers}
 
-The first step is to verify, if the feature selection algorithms perform sufficienctly on the given data set. For this, a crossvalidation of the different classification algorithms is run:
+The first step is to verify, if the feature selection algorithms perform sufficienctly on the given data set. For this, a crossvalidation of different classification algorithms is run:
 
 <<runCV, eval=FALSE>>=
 ## run the crossvalidation
@@ -95,28 +90,26 @@ retCV <- doCV(logX, groupings, fs.methods = c("pamr", "scad", "rf_boruta"),
 	max_allowed_feat = 50, n.threshold = 50, maxRuns = 30)
 @
 
-The above command uses the classification methods PAMR, SCAD-SVM and RF-Boruta and performs a 5-fold (ncv=5) crossvalidation on the training data, repeating the crossvalidation 2 times with different training/test set assignments.
-
-The results are summarised as ROC curves, shown in figures \ref{fig:rocpam}, \ref{fig:rocrf} and \ref{fig:rocscad}.
+The above command uses the classification methods PAMR, SCAD-SVM and RF-Boruta and performs a 5-fold (ncv=5) crossvalidation on the training data, repeating the crossvalidation 2 times with different training/test set assignments. Classification methods and k-fold for the CV can be easily exchanged by setting the appropriate parameters. The results of the crossvalidation are summarised as ROC (Receiver operator characteristic) curves together with the corresponding AUC (area under the curve), shown in figures \ref{fig:rocpam}, \ref{fig:rocrf} and \ref{fig:rocscad}.
 
 \begin{figure}[htp]
 \centering
 \includegraphics[width=8cm,height=8cm]{rocpam}
-\caption{Receiver Operator Characteristic (ROC) curve for the PAM algorithm cross-validation.}
+\caption{Receiver Operator Characteristic (ROC) curve for the PAM algorithm cross-validation. Input data were the simulated data matrix and grouping vectore for 30 samples and 100 features.}
 \label{fig:rocpam}
 \end{figure}
 
 \begin{figure}[htp]
 \centering
 \includegraphics[width=8cm,height=8cm]{rocrf}
-\caption{Receiver Operator Characteristic (ROC) curve for the random forest RF-Boruta algorithm cross-validation.}
+\caption{Receiver Operator Characteristic (ROC) curve for the random forest RF-Boruta algorithm cross-validation. Input data were the simulated data matrix and grouping vectore for 30 samples and 100 features.}
 \label{fig:rocrf}
 \end{figure}
 
 \begin{figure}[htp]
 \centering
 \includegraphics[width=8cm,height=8cm]{rocscad}
-\caption{Receiver Operator Characteristic (ROC) curve for the SCAD-SVM algorithm cross-validation.}
+\caption{Receiver Operator Characteristic (ROC) curve for the SCAD-SVM algorithm cross-validation. Input data were the simulated data matrix and grouping vectore for 30 samples and 100 features.}
 \label{fig:rocscad}
 \end{figure}
 
@@ -145,7 +138,7 @@ Here, 15 bootstrap sample sets are drawn (bstr=15) and feature Selection is done
 bsres <- makeIG(retBS[[1]], SUBDIR=NULL, prob=.9)
 @
 
-This might be useful to inspect the drawn features for each method separately. The parameter \emph{prob=.9} can be used to set the cutoff, how often a feature must cooccur with another feature, such that an edge is drawn between them. However, the general ranking of the importance of the features is done by generating the combined importance graph:
+This might be useful to inspect the selected features for each method separately. The parameter \emph{prob=.9} is used to define the cutoff value, how often a feature at least must co-occur with another feature, in which case an edge is drawn between them. However, the general ranking of the importance of the features is done by generating the combined importance graph from all selected methods:
 
 <<makeCombinedImpgraph, eval=FALSE>>=
 ## create the combined importance graph for all methods
@@ -155,12 +148,12 @@ This might be useful to inspect the drawn features for each method separately. T
 res <- resultBS(retBS, DIR="bs", vlabel.cex = 3, filter = 8, saveres = FALSE)
 @
 
-There are several arguments which customise the look of the importance graph. In this call, the \emph{vlabel.cex} argument defines the magnification factor of the node labels (each node corresponds to one feature). The argument \emph{filter} can be used to specify, how often a feature must cooccur with another, such that an edge is drawn between the two features. Figure \ref{fig:impgraph1} shows the result of the above call.
+There are several arguments which customise the look of the importance graph. In this call, the \emph{vlabel.cex} argument defines the magnification factor of the node labels (each node corresponds to one feature). The argument \emph{filter} can be used to specify, how often a feature must co-occur with another, such that an edge is drawn between the two features. Figure \ref{fig:impgraph1} shows the result of the above call.
 
 \begin{figure}[htp]
 \centering
 \includegraphics[width=12cm,height=12cm]{impgraph1}
-\caption{Importance graph generated by \emph{resultBS}.}
+\caption{Importance graph generated by \emph{resultBS}. Node width is proportional to the absolute frequency of occurrence of a feature across all bootstrap feature selections. Edge width is proportional to the frequency of co-occurrence of the two adjacent nodes.}
 \label{fig:impgraph1}
 \end{figure}
 
@@ -182,7 +175,7 @@ ig <- importance_igraph(res$adj, main = "my test",
 
 % dev.off()
 
-Figure \ref{fig:impgraph2} shows the importance graph generated with the above call. Arguments \emph{vlabel.cex}, \emph{vlabel.cex.min} and \emph{vlabel.cex.max} can be used to adjust the overall, minimum and maximum expansion factor for the node labels. \emph{max\_node\_cex} controls the maximum expansion factor of the node size. The size of the nodes is always proportional to the absolute occurrence of the feature in the \emph{bstr} bootstrapping sample sets. \emph{edge.width} and \emph{max\_edge\_cex} are used for setting the edge width and expansion factor for the edges, respectively, while \emph{ewprop} is a proportionality factor controlling the decrease of edge with decreasing frequency, a higher value of \emph{ewprop} means a fast reduction of edge with and thus less densly packed importance graph plot. Also consider the help pages for the respective functions, to learn about the remaining function arguments.
+Figure \ref{fig:impgraph2} shows the importance graph generated with the above call. Arguments \emph{vlabel.cex}, \emph{vlabel.cex.min} and \emph{vlabel.cex.max} can be used to adjust the overall, minimum and maximum expansion factor for the node labels. \emph{max\_node\_cex} controls the maximum expansion factor of the node size. The size of the nodes is always proportional to the absolute occurrence of the feature in the \emph{bstr} bootstrapping sample sets. \emph{edge.width} and \emph{max\_edge\_cex} are used for setting the edge width and expansion factor for the edges, respectively, while \emph{ewprop} is a proportionality factor controlling the decrease of edge width with decreasing frequency. A higher value of \emph{ewprop} means a fast reduction of edge width and thus a less densly packed importance graph plot. Also consider the help pages for the respective functions, to learn about the remaining function arguments.
 
 \begin{figure}[htp]
 \centering
