@@ -13,19 +13,24 @@ function(X, Y, ncv=5, repeats=10, filename=NULL,
 			X <- X[-nas,]
 			Y <- Y[-nas]
 		}
-		# for scad+L2 or DrHSVM, use discrete search, otherwise use interval search
-		if(fs.method %in% c("scad+L2", "DrHSVM")) {
-			grid.search <- "discrete"
-			#lambda1.scad <- c(seq(0.01 ,0.05, .01),  seq(0.1,0.5, 0.2), 1 ) 	
-			#lambda1.scad <- lambda1.scad[2:3]
-			lambda1.scad <- c(0.01, 0.05, 0.1, 0.25, 0.5, 1)
-			bounds <- NULL
-		} else {
-			grid.search <- "interval"
-			bounds <- t(data.frame(log2lambda1=c(-10, 10)))
-			colnames(bounds) <- c("lower", "upper")
-			lambda1.scad <- NULL
-		}
+        ## somehow this is the only way how these methods are going to work
+        grid.search <- "interval"
+        lambda1.scad <- lambda2.scad <- NULL
+        bounds <- NULL
+
+#~ 		# for scad+L2 or DrHSVM, use discrete search, otherwise use interval search
+#~ 		if(fs.method %in% c("scad+L2", "DrHSVM")) {
+#~ 			grid.search <- "discrete"
+#~ 			#lambda1.scad <- c(seq(0.01 ,0.05, .01),  seq(0.1,0.5, 0.2), 1 ) 	
+#~ 			#lambda1.scad <- lambda1.scad[2:3]
+#~ 			lambda1.scad <- c(0.01, 0.05, 0.1, 0.25, 0.5, 1)
+#~ 			bounds <- NULL
+#~ 		} else {
+#~ 			grid.search <- "interval"
+#~ 			bounds <- t(data.frame(log2lambda1=c(-10, 10)))
+#~ 			colnames(bounds) <- c("lower", "upper")
+#~ 			lambda1.scad <- NULL
+#~ 		}
 		## CV
 		cvby <- ceiling(nrow(X)/ncv)
 		## initialize the result objects
@@ -48,11 +53,11 @@ function(X, Y, ncv=5, repeats=10, filename=NULL,
 				## run svmscad
 				st <- system.time( 
                         scad<- my.svm.fs(train, y=traing, fs.method=fs.method, bounds=bounds,
-								lambda1.set=lambda1.scad,
+								lambda1.set=lambda1.scad, lambda2.set=lambda2.scad,
 								cross.outer= 0, grid.search = grid.search,  maxIter = maxiter, 
 								inner.val.method = "cv", cross.inner= 5, maxevals=maxevals,
-								seed=seed, parms.coding = "log2", show="none", verbose=FALSE )
-                        )		
+								seed=seed, parms.coding = "log2", show="none", verbose=TRUE )
+                        )
 				scad.test <- predict.penSVM(scad, test, newdata.labels=testg)
 				sn <- c(sn, scad.test$sensitivity)
 				sp <- c(sp, scad.test$specificity)
