@@ -5,7 +5,7 @@ Version: 1.0.6
 Date: 2012-08-01
 Author: Christian Bender
 Maintainer: Christian Bender <christian.bender@tron-mainz.de>
-Description: To select a highly discriminative set of features classifying two groups of samples, multiple classification and feature selection algorithms are utilised. By combining the results of all methods and selecting features in a bootstrapping approach, a robust set of discriminative features is selected.
+Description: To select a set of features for classification of two groups of samples, multiple classification and feature selection algorithms are utilised. By combining the results of all methods and applying a bootstrapping approach a robust set of features with high power to distinguish the two groups is selected.
 License: GPL (>=2)
 Depends: lhs, tgp, mlegp, penalizedSVM, Boruta, pamr, gplots, colorRamps, ROCR, igraph0
 Suggests: parallel
