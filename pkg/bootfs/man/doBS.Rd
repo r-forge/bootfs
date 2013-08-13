@@ -104,8 +104,7 @@ retBS <- doBS(logX, groupings,
 	maxiter=100, maxevals=50, bounds=NULL,
 	max_allowed_feat=NULL, n.threshold=50,
 	maxRuns=30)
-retBS <- doBS(logX, groupings, fs.methods=c("pamr","scad","rf_boruta"),	DIR="bs", seed=123, bstr=15, saveres=FALSE, jitter=FALSE, maxiter=100, maxevals=50, bounds=NULL, max_allowed_feat=NULL, n.threshold=50,	maxRuns=30)
-
+	
 bsres <- makeIG(retBS[[1]], SUBDIR=NULL)
 
 ## create the combined importance graph for all methods

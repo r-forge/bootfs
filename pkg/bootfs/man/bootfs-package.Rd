@@ -52,15 +52,17 @@ data <- simDataSet(nsam=30, ngen=100, sigma=2, plot=TRUE)
 logX <- data$logX
 groupings <- data$groupings
 
-methods <- c("pamr", "scad", "rf_boruta", "1norm", "scad+L2", "DrHSVM")
+methods <- c("pamr", "scad", "rf_boruta")
 
 ## run the crossvalidation
+## takes a while
 retCV <- doCV(logX, groupings, fs.methods = methods, 
 	DIR = "cv", seed = 123, ncv = 5, repeats = 5, 
 	jitter=FALSE, maxiter = 100, maxevals = 50, 
 	max_allowed_feat = 50, n.threshold = 50, maxRuns = 30)
 
-## run the bootstrapping, use only first three methods
+## run the bootstrapping
+## takes a while
 retBS <- doBS(logX, groupings, 
 	fs.methods=methods,
 	DIR="bs", 
@@ -69,13 +71,22 @@ retBS <- doBS(logX, groupings,
 	max_allowed_feat=NULL, n.threshold=50,
 	maxRuns=30)
 
-#retBS <- doBS(logX, groupings, fs.methods=methods[4], DIR="bs", seed=123, bstr=2, saveres=FALSE, jitter=FALSE,	maxiter=20, maxevals=20, bounds=NULL,max_allowed_feat=NULL, n.threshold=25,maxRuns=10)
+## only use one method
+#retBS <- doBS(logX, groupings, fs.methods=methods[1], DIR="bs", 
+	seed=123, bstr=2, saveres=FALSE, jitter=FALSE,	maxiter=20, 
+	maxevals=20, bounds=NULL,max_allowed_feat=NULL, 
+	n.threshold=25,maxRuns=10)
 
-## create the importance graph using the first 3 FS-methods
+## create the importance graph using the 3 FS-methods
 ## and export the adjacency matrix containing the 
-## numbers of occuerrences of the features, as well 
+## numbers of occurrences of the features, as well 
 ## as the top hits.
-res <- resultBS(retBS, DIR="bs", vlabel.cex = 3, filter = 0, saveres = FALSE, useresults=1:3)
+res <- resultBS(retBS, DIR="bs", vlabel.cex = 3, filter = 0, saveres = FALSE)
+
+## only use methods 1 and 2
+res2 <- resultBS(retBS, DIR="bs", vlabel.cex = 3, filter = 0, saveres = FALSE, 
+		useresults=1:2)
+
 
 ## plot the importance graph
 ig <- importance_igraph(res$adj, main = "my test", 
