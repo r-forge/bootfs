@@ -26,9 +26,9 @@
         ## use multicores if more than one group is to be classified
         useparallel <- length(grep("package:(parallel|multicore)", search())>0)
         if(length(X)>1 & useparallel) {
-			resPAM <- mclapply(X, pamclass, logX=logX, nfold=ncv, n.threshold=n.threshold, seed=seed, max_allowed_feat=max_allowed_feat, repeats=repeats, mc.preschedule=TRUE, mc.cores=length(X))
+			resPAM <- mclapply(X, cv_pamclass, logX=logX, nfold=ncv, n.threshold=n.threshold, seed=seed, max_allowed_feat=max_allowed_feat, repeats=repeats, mc.preschedule=TRUE, mc.cores=length(X))
 		} else {
-			resPAM <- lapply(X, pamclass, logX=logX, nfold=ncv, n.threshold=n.threshold, seed=seed, max_allowed_feat=max_allowed_feat, repeats=repeats)
+			resPAM <- lapply(X, cv_pamclass, logX=logX, nfold=ncv, n.threshold=n.threshold, seed=seed, max_allowed_feat=max_allowed_feat, repeats=repeats)
 		}
 		## make the feature table
 		featlist <- sapply(resPAM, extract_feat_pam, SUBDIR=SUBDIR)

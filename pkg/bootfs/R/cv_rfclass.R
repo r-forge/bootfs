@@ -82,10 +82,10 @@ function(X, logX, ncv=5, repeats=10, seed=123,
 				randfpred <- predict(randf, test, type="prob")
 				fitted <- cbind(fitted, randfpred[,2]) # attach the prediction probability for the positive class
 				labels <- cbind(labels, testg)
-				fitlist[[it]] <- randf
-				testlist[[it]] <- randfpred
+				fitlist[[it]] <- randf # random forest on train dat with selected features
+				testlist[[it]] <- randfpred # corresponding prediction
 				features[[it]] <- selprobes
-				breslist[[it]] <- bres
+				breslist[[it]] <- bres # boruta training objec
 				rm(bres)
 			} # cv loop
 		} # repeat loop

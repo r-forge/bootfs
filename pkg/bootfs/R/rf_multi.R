@@ -1,3 +1,5 @@
+## for bootstrapping
+
 rf_multi <- function(X, datX, maxRuns=500, seed=123, bstr=100) {
         datY <- X[[1]]
         nasY <- which(is.na(datY))

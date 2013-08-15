@@ -8,7 +8,9 @@ Performance evaluation by crossvalidation for multiple classification algorithms
 Evaluate the performance of multiple classification/feature selection algorithms using crossvalidation.
 }
 \usage{
-doCV(logX, groupings, fs.methods = c("pamr", "scad", "rf_boruta"), DIR = "cv", seed = 123, ncv = 5, repeats = 10, jitter=FALSE, maxiter = 1000, maxevals = 500, max_allowed_feat = 500, n.threshold = 50, maxRuns = 300)
+doCV(logX, groupings, fs.methods = c("pamr", "scad", "rf_boruta"), DIR = "cv", 
+	seed = 123, ncv = 5, repeats = 10, jitter=FALSE, maxiter = 1000, maxevals = 500,
+	max_allowed_feat = 500, n.threshold = 50, maxRuns = 300)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
