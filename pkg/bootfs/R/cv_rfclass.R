@@ -17,7 +17,7 @@ function(X, logX, ncv=5, repeats=10, seed=123,
 		if(length(unique(yp))==2) {
 			distribution <- "bernoulli"
 			#data$traing <- factor(ifelse(traing==1, 1, 0))
-			data$traing <- ifelse(yp==1, 1, 0)
+			#yp <- ifelse(yp==1, 1, 0)
 		} else {
 			distribution <- "multinomial"
 		}
@@ -27,7 +27,8 @@ function(X, logX, ncv=5, repeats=10, seed=123,
 		#ncv <- 5
 		cvby <- ceiling(nrow(x)/ncv) # round up
 		## initialize the result objects
-		sn <- sp <- fitted <- labels <- testdim <- NULL
+		sn <- sp <- testdim <- NULL
+		fitted <- labels <- list()
 		fitlist <- testlist <- features <- breslist <- list()
 		it <- 0
 		set.seed(seed)
@@ -35,7 +36,13 @@ function(X, logX, ncv=5, repeats=10, seed=123,
 			## find a permutation leaving stratified test/training sets
 			## with regard to the class label distributions
 			#folds <- select_cv_balanced(x, yp, ncv)
-			folds <- select_cv_balanced(yp, ncv)
+			#folds <- select_cv_balanced(yp, ncv)
+			nottwoclasses <- TRUE
+			while(nottwoclasses) {
+				folds <- createFolds(yp, k=ncv, returnTrain=FALSE) ## from caret package
+				nottwoclasses <- any(sapply(folds, function(x, yp) length(unique(yp[x]))<2, yp=yp))
+			}
+
 			for(i in 1:ncv) {
 				it <- it + 1
 				sel <- folds[[i]]
@@ -97,13 +104,16 @@ function(X, logX, ncv=5, repeats=10, seed=123,
 					allmax <- apply(rfpred, 1, max)
 					randfpred <- kx[argmax] + allmax
 					# attach the prediction probability for the classes. Note that these are one probability for each class, i.e. a matrix with n.class columns for each fold/repeat
-					fitted <- cbind(fitted, randfpred)
+					#fitted <- cbind(fitted, randfpred)
+					fitted[[it]] <- randfpred
 				} else {
 					## predict using the rfrand model
 					randfpred <- predict(randf, test, type="prob")
-					fitted <- cbind(fitted, randfpred[,2]) # attach the prediction probability for the positive class
+					#fitted <- cbind(fitted, randfpred[,2]) # attach the prediction probability for the positive class
+					fitted[[it]] <- randfpred[,2]
 				}
-				labels <- cbind(labels, testg)
+				#labels <- cbind(labels, testg)
+				labels[[it]] <- testg
 				fitlist[[it]] <- randf # random forest on train dat with selected features
 				testlist[[it]] <- randfpred # corresponding prediction
 				features[[it]] <- selprobes
@@ -121,10 +131,10 @@ function(X, logX, ncv=5, repeats=10, seed=123,
 
 		## handle binomial and multiclass classification differently
 		if(distribution=="multinomial") {
-			aucs <- vector("numeric", ncol(fitted))	
-			for(ki in 1:ncol(labels)) {
-				grpx <- labels[,ki]
-				predx <- fitted[,ki]
+			aucs <- vector("numeric", length(fitted))	
+			for(ki in 1:length(labels)) {
+				grpx <- labels[[ki]]
+				predx <- fitted[[ki]]
 				aucs[ki] <- multiclass.roc(grpx~predx)$auc
 			}
 			## plot auc distribution
@@ -132,10 +142,12 @@ function(X, logX, ncv=5, repeats=10, seed=123,
 			axis(1, at=1, labels="multiclass AUC")
 			legend("bottomright", border="white", fill="white", legend=c("classes:",levels(Y)))
 		} else {
-			auc <- roc(fitted,labels,measure="tpr",x.measure="fpr",colorize=colorize, avg=avg, spread.estimate=spread.estimate, filter=0)
-			title(main="ROC curves for each CV run")
-			roc(as.vector(fitted),as.vector(labels),measure="tpr",x.measure="fpr",colorize=colorize, avg="none", spread.estimate="none", filter=0)
-			title(main="ROC curves averaged over all CV runs")
+			auc <- roc(as.vector(unlist(fitted)),as.vector(unlist(labels)),measure="tpr",x.measure="fpr",colorize=colorize, avg="none", spread.estimate="none", filter=0)
+			title(main="ROC curves averaged over all CV runs")	
+			#auc <- roc(fitted,labels,measure="tpr",x.measure="fpr",colorize=colorize, avg=avg, spread.estimate=spread.estimate, filter=0)
+			#title(main="ROC curves for each CV run")	#roc(as.vector(fitted),as.vector(labels),measure="tpr",x.measure="fpr",colorize=colorize, avg="none", spread.estimate="none", filter=0)
+			#title(main="ROC curves averaged over all CV runs")
+			roc_binterval(fitted, labels)
 		}
 		if(!is.null(filename)) {
 			dev.off()

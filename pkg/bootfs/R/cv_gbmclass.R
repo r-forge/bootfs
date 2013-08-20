@@ -29,15 +29,22 @@ function(X, logX, ncv=5, repeats=10, seed=123, params,
 	#ncv <- 5
 	cvby <- ceiling(nrow(x)/ncv) # round up
 	## initialize the result objects
-	sn <- sp <- fitted <- labels <- testdim <- NULL
+	sn <- sp <- testdim <- NULL
+	fitted <- labels <- list()
 	predlist <- fitlist <- testlist <- features <- gbmlist <- list()
 	it <- 0
 	set.seed(seed)
 	for(ri in 1:repeats) {
 		## find a permutation leaving stratified test/training sets
 		## with regard to the class label distributions
-		folds <- createFolds(yp, ncv, returnTrain=FALSE) ## from caret package
+		nottwoclasses <- TRUE
+		while(nottwoclasses) {
+			folds <- createFolds(yp, ncv, returnTrain=FALSE) ## from caret package
+			nottwoclasses <- any(sapply(folds, function(x, yp) length(unique(yp[x]))<2, yp=yp))
+		}
+
 		for(i in 1:ncv) {
+
 			it <- it + 1
 			sel <- folds[[i]]
 			seltrain <- setdiff(1:nrow(x), sel)
@@ -70,9 +77,7 @@ function(X, logX, ncv=5, repeats=10, seed=123, params,
 			testg <- yp[sel]
 			train <- x[seltrain,]
 			traing <- yp[seltrain]
-			## perform feature selection on train data
-				#browser()
-
+		
 			# create a try error object to initialise the loop
 			# below -> can this be done more elegantly?
 			btr <- try(silent=TRUE)
@@ -98,7 +103,9 @@ function(X, logX, ncv=5, repeats=10, seed=123, params,
 			###########################
 			if(distribution=="bernoulli") {
 				gbmpred <- predict(gbm1, newdata=tdata, ntrees=best.iter, type="link")
-				fitted <- cbind(fitted, gbmpred) # attach the prediction probability for the positive class
+				#fitted <- cbind(fitted, gbmpred) # attach the prediction probability for the positive class
+				fitted[[it]] <- gbmpred # attach the prediction probability for the positive class
+				pred <- gbmpred
 			###########################
 			} else {
 			###########################
@@ -110,10 +117,12 @@ function(X, logX, ncv=5, repeats=10, seed=123, params,
 				allmax <- apply(gbmpred, 1, max)
 				pred <- kx[argmax] + allmax
 				 # attach the prediction probability for the classes. Note that these are one probability for each class, i.e. a matrix with n.class columns for each fold/repeat
-				fitted <- cbind(fitted, pred)
+				#fitted <- cbind(fitted, pred)
+				fitted[[it]] <- pred
 			}
 			###########################
-			labels <- cbind(labels, testg)
+			#labels <- cbind(labels, testg)
+			labels[[it]] <- testg
 			predlist[[it]] <- pred ## class prediciton vector, can be used in multiclass.roc
 			#fitlist[[it]] <- gbm1 ## model fitted on subset of variables???
 			testlist[[it]] <- gbmpred ## prediction objects
@@ -128,11 +137,11 @@ function(X, logX, ncv=5, repeats=10, seed=123, params,
 		pdf(filename)
 	}
 	if(distribution=="bernoulli") {
-		auc <- roc(fitted,labels,measure="tpr",x.measure="fpr",colorize=colorize, avg=avg, spread.estimate=spread.estimate, filter=0)
-		title(main="ROC curves for each CV run")
-		roc(as.vector(fitted),as.vector(labels),measure="tpr",x.measure="fpr",colorize=colorize, avg="none", spread.estimate="none", filter=0)
+		#auc <- roc(fitted,labels,measure="tpr",x.measure="fpr",colorize=colorize, avg=avg, spread.estimate=spread.estimate, filter=1)
+		#title(main="ROC curves for each CV run")
+		auc <- roc(as.vector(unlist(fitted)),as.vector(unlist(labels)),measure="tpr",x.measure="fpr",colorize=colorize, avg="none", spread.estimate="none", filter=0)
 		title(main="ROC curves averaged over all CV runs")
-
+		roc_binterval(fitted, labels)
 	} else {
 		aucs <- vector("numeric", ncol(fitted))	
 		for(ki in 1:ncol(labels)) {
@@ -172,7 +181,13 @@ fitGBM <- function(train, traing, ntree, shrinkage, interaction.depth, bag.fract
 	form <- as.formula(paste("traing", paste(colnames(train),collapse="+"), sep="~"))
 	data <- data.frame(train)
 	data[["traing"]] <- factor(traing)
-	if(length(unique(traing))==2) {
+	clvec <- traing
+	raus <- which(is.na(clvec))
+	if(length(raus)>0) {
+		clvec <- clvec[-raus]
+	}
+
+	if(length(unique(clvec))==2) {
 		distribution <- "bernoulli"
 		#data$traing <- factor(ifelse(traing==1, 1, 0))
 		data$traing <- ifelse(traing==1, 1, 0)

@@ -62,7 +62,7 @@ doCV(logX, groupings, fs.methods = c("pamr", "scad", "rf_boruta"), DIR = "cv",
 }
 }
 \details{
-	Use this function to evaluate the performance of classifying the groups assigned in \code{groupings} using classification algorithms defined in \code{fs.methods}. Performance is estimated in a crossvalidation with \code{ncv} folds and \code{repeats} repeats by generating ROC curves showing expected sensitivity and 1-specificity, as well as AUC.
+	Use this function to evaluate the performance of classifying the groups assigned in \code{groupings} using classification algorithms defined in \code{fs.methods}. Performance is estimated in a crossvalidation with \code{ncv} folds and \code{repeats} repeats by generating ROC curves showing expected sensitivity and 1-specificity, as well as AUC.\cr
 
 	The function argument \code{params} is a named list containing the parameters used for the different methods. In general, the arguments for each applied method can be specified. The following parameters can be specified, listed by the method:\cr
 	\describe{
@@ -78,7 +78,19 @@ doCV(logX, groupings, fs.methods = c("pamr", "scad", "rf_boruta"), DIR = "cv",
 	Output is stored in directory \code{DIR}.
 }
 \references{
-Todo.
+Boser, B.E., Guyon, I.M., Vapnik, V.N.:  A Training Algorithm for Optimal Margin Classifiers. Proceedings of the 5th Annual ACM Workshop on Computational Learning Theory, 1992.
+
+Zhang, Hao Helen and Ahn, Jeongyoun and Lin, Xiaodong and Park, Cheolwoo: Gene selection using support vector machines with non-convex penalty. Bioinformatics (2006) 22 (1): 88-95
+
+Breiman, L. (2001), Random Forests, Machine Learning 45(1), 5-32
+
+Miron B. Kursa, Witold R. Rudnicki (2010). Feature Selection with the Boruta Package. Journal of Statistical Software, 36(11), p. 1-13. URL: http://www.jstatsoft.org/v36/i11/
+
+Robert Tibshirani, Trevor Hastie, Balasubramanian Narasimhan, and Gilbert Chu. "Diagnosis of multiple cancer types by shrunken centroids of gene expression" PNAS 2002 99:6567-6572 (May 14)
+
+Friedman, J. H.: Stochastic Gradient Boosting. (March 1999)
+
+Friedman, J. H.: Greedy function approximation: A gradient boosting machine. Ann. Statist. Volume 29, Number 5 (2001), 1189-1232.
 }
 \author{
 Christian Bender (christian.bender@tron-mainz.de)
@@ -88,7 +100,7 @@ Todo.
 }
 
 \seealso{
-R-packages: \code{penalizedSVM}, \code{Boruta}, \code{pamr}
+R-packages: \code{penalizedSVM}, \code{Boruta}, \code{pamr}, \code{gbm}
 }
 \examples{
 \dontrun{

@@ -31,7 +31,12 @@ run_pam <- function(pamdat, nfold=5, n.threshold=30, seed=NULL) {
 		histtr <- pamr.train(pamdat, n.threshold=n.threshold)
 		## define the folds variable
 		#folds <- select_cv_balanced(pamdat$y, nfold)
-		folds <- createFolds(pamdat$y, k=nfold, returnTrain=FALSE) ## from caret package
+		nottwoclasses <- TRUE
+		while(nottwoclasses) {
+			folds <- createFolds(pamdat$y, k=nfold, returnTrain=FALSE) ## from caret package
+			nottwoclasses <- any(sapply(folds, function(x, yp) length(unique(yp[x]))<2, yp=pamdat$y))
+		}
+		#folds <- createFolds(pamdat$y, k=nfold, returnTrain=FALSE) ## from caret package
 		histcv <- pamr.cv(histtr, pamdat, folds=folds)
 		#histcv <- pamr.cv(histtr, pamdat, nfold=nfold)
 		ts <- histcv$threshold
