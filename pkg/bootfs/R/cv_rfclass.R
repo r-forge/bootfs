@@ -13,6 +13,15 @@ function(X, logX, ncv=5, repeats=10, seed=123,
 			yp <- Y
 		}
 
+		## determine the type of classification
+		if(length(unique(yp))==2) {
+			distribution <- "bernoulli"
+			#data$traing <- factor(ifelse(traing==1, 1, 0))
+			data$traing <- ifelse(yp==1, 1, 0)
+		} else {
+			distribution <- "multinomial"
+		}
+
 		## CV
 		#library(ROCR)
 		#ncv <- 5
@@ -78,15 +87,29 @@ function(X, logX, ncv=5, repeats=10, seed=123,
 				if(length(selprobes)>0) {
 					randf <- randomForest(train[,selprobes], y=factor(traing),  xtest=NULL, ytest=NULL, ntree=500, keep.forest=TRUE, proximity=TRUE)
 				}
-				## predict using the rfrand model
-				randfpred <- predict(randf, test, type="prob")
-				fitted <- cbind(fitted, randfpred[,2]) # attach the prediction probability for the positive class
+
+				## predict for multinomial or bernoulli
+				if(distribution=="multinomial") {
+					rfpred <- predict(randf, newdata=test, type="prob")
+					Ncl <- ncol(rfpred)
+					kx <- 0:Ncl * 2
+					argmax <- apply(rfpred, 1, function(x) which(x==max(x)))
+					allmax <- apply(rfpred, 1, max)
+					randfpred <- kx[argmax] + allmax
+					# attach the prediction probability for the classes. Note that these are one probability for each class, i.e. a matrix with n.class columns for each fold/repeat
+					fitted <- cbind(fitted, randfpred)
+				} else {
+					## predict using the rfrand model
+					randfpred <- predict(randf, test, type="prob")
+					fitted <- cbind(fitted, randfpred[,2]) # attach the prediction probability for the positive class
+				}
 				labels <- cbind(labels, testg)
 				fitlist[[it]] <- randf # random forest on train dat with selected features
 				testlist[[it]] <- randfpred # corresponding prediction
 				features[[it]] <- selprobes
 				breslist[[it]] <- bres # boruta training objec
 				rm(bres)
+				
 			} # cv loop
 		} # repeat loop
 
@@ -94,11 +117,26 @@ function(X, logX, ncv=5, repeats=10, seed=123,
 		if(!is.null(filename)) {
 			pdf(filename)
 		}
-		auc <- roc(fitted,labels,measure="tpr",x.measure="fpr",colorize=colorize, avg=avg, spread.estimate=spread.estimate, filter=0)
-		title(main="ROC curves for each CV run")
-		roc(as.vector(fitted),as.vector(labels),measure="tpr",x.measure="fpr",colorize=colorize, avg="none", spread.estimate="none", filter=0)
-		title(main="ROC curves averaged over all CV runs")
 
+
+		## handle binomial and multiclass classification differently
+		if(distribution=="multinomial") {
+			aucs <- vector("numeric", ncol(fitted))	
+			for(ki in 1:ncol(labels)) {
+				grpx <- labels[,ki]
+				predx <- fitted[,ki]
+				aucs[ki] <- multiclass.roc(grpx~predx)$auc
+			}
+			## plot auc distribution
+			boxplot(aucs, ylim=c(0,1), main=c(paste(Ncl, "- class classification"), "multinomial model"))
+			axis(1, at=1, labels="multiclass AUC")
+			legend("bottomright", border="white", fill="white", legend=c("classes:",levels(Y)))
+		} else {
+			auc <- roc(fitted,labels,measure="tpr",x.measure="fpr",colorize=colorize, avg=avg, spread.estimate=spread.estimate, filter=0)
+			title(main="ROC curves for each CV run")
+			roc(as.vector(fitted),as.vector(labels),measure="tpr",x.measure="fpr",colorize=colorize, avg="none", spread.estimate="none", filter=0)
+			title(main="ROC curves averaged over all CV runs")
+		}
 		if(!is.null(filename)) {
 			dev.off()
 		}

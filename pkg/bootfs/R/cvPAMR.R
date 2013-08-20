@@ -40,6 +40,12 @@
 		pdf(paste(SUBDIR, "PAMR_ROC_Curves.pdf", sep="/")) #, width=10, height=10)
 		#par(mfrow=c(3,3))
 		for(i in 1:length(X)) {
+			## find the distribution type
+			if(length(unique(X[[i]][[1]]))==2) {
+				distribution <- "bernoulli"
+			} else {
+				distribution <- "multinomial"
+			}
 			#obj <- resPAM[[i]]$cv
 			rpam <- resPAM[[i]]
 			yhat <- yreal <- NULL
@@ -51,25 +57,54 @@
 					th <- rpam[[ri]]$tmin
 					#th <- resPAM[[i]]$tmin
 					thind <- which(obj$threshold==th)
-					## get the curves for each fold, for all classes and the best threshold
-					#probabilities of classifying the sample in the positive class
-					yhat.rep <- c(yhat.rep, as.vector(obj$prob[fold, 2, thind]))
-					yreal.rep <- c(yreal.rep,as.numeric(as.character(obj$y))[fold])
+					if(distribution=="multinomial") {
+						xpred <- obj$prob[fold,,thind]
+						Ncl <- ncol(xpred)
+						kx <- 0:Ncl * 2
+						argmax <- apply(xpred, 1, function(x) which(x==max(x)))
+						allmax <- apply(xpred, 1, max)
+						pred <- kx[argmax] + allmax
+						# attach the prediction probability for the classes. Note that these are one probability for each class, i.e. a matrix with n.class columns for each fold/repeat
+						#fitted <- cbind(fitted, pred)
+						yhat.rep <- c(yhat.rep, pred)
+						yreal.rep <- c(yreal.rep,as.numeric(obj$y)[fold])
+					} else {
+						## get the curves for each fold, for all classes and the best threshold
+						#probabilities of classifying the sample in the positive class
+						yhat.rep <- c(yhat.rep, as.vector(obj$prob[fold, 2, thind]))
+						yreal.rep <- c(yreal.rep,as.numeric(as.character(obj$y))[fold])
+					}
+					
 				}
 				## combine the repeats in one single table
 				yhat <- cbind(yhat, yhat.rep)
 				yreal <- cbind(yreal, yreal.rep)
 			}
-			## make the roc curve
-			pred <- prediction(yhat, yreal)
-			roc.curve <- performance(pred, "tpr", "fpr")
-			## since we concatenate each yhat/yreal pair of values,
-			## peformance(pred,"auc")@y.values always has exactly one
-			## element, so we use this for auc calculation
-			#auc <- signif(performance(pred, "auc")@y.values[[1]], digits=3)
-			aucs <- unlist(performance(pred, "auc")@y.values)
-			auc <- signif(median(aucs), digits=3)
-			plot(roc.curve, avg="threshold", spread.estimate="none", sub=paste("AUC:", auc), main=names(X)[i])
+
+			if(distribution=="multinomial") {
+				aucs <- vector("numeric", ncol(yhat))	
+				for(ki in 1:ncol(yreal)) {
+					grpx <- yreal[,ki]
+					predx <- yhat[,ki]
+					aucs[ki] <- multiclass.roc(grpx~predx)$auc
+				}
+				Y <- X[[i]][[1]]
+				## plot auc distribution
+				boxplot(aucs, ylim=c(0,1), main=c(paste(Ncl, "- class classification"), "multinomial model"))
+				axis(1, at=1, labels="multiclass AUC")
+				legend("bottomright", border="white", fill="white", legend=c("classes:",levels(Y)))
+			} else {
+				## make the roc curve
+				pred <- prediction(yhat, yreal)
+				roc.curve <- performance(pred, "tpr", "fpr")
+				## since we concatenate each yhat/yreal pair of values,
+				## peformance(pred,"auc")@y.values always has exactly one
+				## element, so we use this for auc calculation
+				#auc <- signif(performance(pred, "auc")@y.values[[1]], digits=3)
+				aucs <- unlist(performance(pred, "auc")@y.values)
+				auc <- signif(median(aucs), digits=3)
+				plot(roc.curve, avg="threshold", spread.estimate="none", sub=paste("AUC:", auc), main=names(X)[i])
+			}
 
 		}
 		dev.off()

@@ -30,7 +30,8 @@ run_pam <- function(pamdat, nfold=5, n.threshold=30, seed=NULL) {
 		#pamdat <- pamdat[-3] ## remove the max_allowed_feat stuff
 		histtr <- pamr.train(pamdat, n.threshold=n.threshold)
 		## define the folds variable
-		folds <- select_cv_balanced(pamdat$y, nfold)
+		#folds <- select_cv_balanced(pamdat$y, nfold)
+		folds <- createFolds(pamdat$y, k=nfold, returnTrain=FALSE) ## from caret package
 		histcv <- pamr.cv(histtr, pamdat, folds=folds)
 		#histcv <- pamr.cv(histtr, pamdat, nfold=nfold)
 		ts <- histcv$threshold

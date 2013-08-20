@@ -65,7 +65,7 @@ if (testflag == 0){
 #        DIRini(Problem,n,bounds(:,1),bounds(:,2),...
 #        lengths,c,fc,con, feas_flags, szes,...
 #        theglobalmin,maxdeep,testflag,g_nargout, impcons, varargin{:});
-DIRini.list<-.DIRini(Problem,n, a=bounds[,"lower"], b=bounds[, "upper"],
+DIRini.list<-penalizedSVM:::.DIRini(Problem,n, a=bounds[,"lower"], b=bounds[, "upper"],
         # p_lengths=lengths, 
         param.names= rownames(bounds),
         c=c,fc=fc, con=con, 
@@ -105,7 +105,7 @@ if(showits != "none")
 minval = fc[1] + con[1]
 while (perror > tol){
    #%-- Create list S of potentially optimal hyper-rectangles
-   S <- .find_po(fc=fc+con,
+   S <- penalizedSVM:::.find_po(fc=fc+con,
        				 lengths= lengths,
        				 minval=minval, ep=ep, szes=szes)
 	# if we don't find potentially hyper-rectanges --> break!
@@ -115,7 +115,7 @@ while (perror > tol){
    #%-- and divide -------------------------------------------------%
    for (i in 1:ncol(S)){
      # [lengths,fc,c,con,feas_flags,szes,fcncounter,success] = ...
-     #     .DIRdivide(bounds(:,1),bounds(:,2),Problem,S(1,i),thirds,lengths,...
+     #     penalizedSVM:::.DIRdivide(bounds(:,1),bounds(:,2),Problem,S(1,i),thirds,lengths,...
      #     fc,c,con,feas_flags,fcncounter,szes,impcons,calltype,varargin{:});
      
      # plot options:
@@ -129,7 +129,7 @@ while (perror > tol){
 	     if ( (showits =="all") )showits.flag <-  TRUE
      }
     
-     tmp.list.divide<-  .DIRdivide(a=bounds[,1], b=bounds[,2],Problem=Problem,
+     tmp.list.divide<-  penalizedSVM:::.DIRdivide(a=bounds[,1], b=bounds[,2],Problem=Problem,
 														index=S[1,i], thirds=thirds, lengths=lengths,
    													fc=fc,c=c,con=con, feas_flags=feas_flags,
           									p_fcncounter=fcncounter, szes=szes,
@@ -195,7 +195,7 @@ while (perror > tol){
   #%-- New, 06/09/2004
   #%-- Call replaceinf if impcons flag is set to 1
   if (impcons == 1) {
-    fc <- .replaceinf(lengths=lengths,c=c,fc=fc,con=con,
+    fc <- penalizedSVM:::.replaceinf(lengths=lengths,c=c,fc=fc,con=con,
                     flags=feas_flags, pert=pert)
   }
 

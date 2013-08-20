@@ -1,5 +1,6 @@
-\name{bootFS-package}
-\alias{bootFS-package}
+\name{bootfs-package}
+\alias{bootfs-package}
+\alias{bootfs}
 \alias{bootFS}
 \docType{package}
 \title{
@@ -10,16 +11,17 @@ The package is intended as a convenient wrapper to multiple classification and f
 }
 \details{
 \tabular{ll}{
-Package: \tab bootFS\cr
+Package: \tab bootfs\cr
 Type: \tab Package\cr
 %Version: \tab 1.0.3\cr
 %Date: \tab 2012-08-01\cr
 License: \tab GPL (>=2)\cr
 }
 The following methods are implemented:\cr
-SVM + SCAD: Support vector machines with Smoothly clipped absolute deviation feature selection (used from package \code{penalizedSVM}).\cr
+SVM + SCAD: Support vector machines with Smoothly clipped absolute deviation feature selection (used from package \code{penalizedSVM}). Also, other models implemented in the penalizedSVM package can be used.\cr
 RF + Boruta: Random forests and Boruta feature selection.\cr
 PAMR: Prediction analysis for microarrays\cr
+GBM: Generalized boosting machine. \cr
 
 }
 \author{
@@ -35,6 +37,8 @@ Miron B. Kursa, Witold R. Rudnicki (2010). Feature Selection with the Boruta Pac
 
 
 Robert Tibshirani, Trevor Hastie, Balasubramanian Narasimhan, and Gilbert Chu. "Diagnosis of multiple cancer types by shrunken centroids of gene expression" PNAS 2002 99:6567-6572 (May 14)
+
+Friedman: GBM, Stochastic gradient boosting.
 }
 \keyword{ package }
 \seealso{
@@ -42,6 +46,7 @@ Robert Tibshirani, Trevor Hastie, Balasubramanian Narasimhan, and Gilbert Chu. "
 Help for \code{penalizedSVM}\cr
 Help for \code{Boruta}\cr
 Help for \code{pamr}\cr
+Help for \code{gbm}\cr
 }
 \examples{
 \dontrun{
@@ -112,6 +117,17 @@ drawheat(logX[,tophits], groups = groupings[[1]], log = FALSE,
 			mar = c(12, 10), distfun = dist.eucsq,
 			hclustfun = ward, cexCol = 1, cexRow = 1) 
 
+
+## do multiclass classification
+data(iris)
+
+groupings <- list(Species=iris$Species)
+logX <- iris[,1:4]
+methods <- c("gbm","rf_boruta","pamr")
+retCV <- doCV(logX, groupings, fs.methods = methods, 
+	DIR = "cv_gbm", seed = 123, ncv = 5, repeats = 5, 
+	jitter=FALSE, maxiter = 100, maxevals = 50, 
+	max_allowed_feat = 50, n.threshold = 50, maxRuns = 30)
 
 
 ## removethe created directory			

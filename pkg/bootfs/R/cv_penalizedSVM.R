@@ -101,7 +101,7 @@ function(X, Y, ncv=5, repeats=10, filename=NULL,
 				# 2nd plot: visited lambda points vs. cv errors
 				# 3rd plot: the same as the 2nd plot, Ytrain.exclude points are excluded. 
 				# The value cv.error = 10^16 stays for the cv error for an empty model ! 
-				.plot.EPSGO.parms (scad$model$fit.info$Xtrain, scad$model$fit.info$Ytrain, bounds=bounds, Ytrain.exclude=10^16, plot.name=NULL )
+				penalizedSVM:::.plot.EPSGO.parms (scad$model$fit.info$Xtrain, scad$model$fit.info$Ytrain, bounds=bounds, Ytrain.exclude=10^16, plot.name=NULL )
 			}
 		}
 		

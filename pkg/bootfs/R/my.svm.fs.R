@@ -135,7 +135,7 @@ my.svm.fs <- function (x, ...)
 	
 	if (grid.search=="discrete") {
 	
-		model<-.run.discrete(x=x,y=y, fs.method=fs.method,
+		model<-penalizedSVM:::.run.discrete(x=x,y=y, fs.method=fs.method,
 												lambda1.set=lambda1.set,
 												lambda2.set=lambda2.set,
 												parms.coding=parms.coding,

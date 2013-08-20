@@ -10,7 +10,7 @@ Evaluate the performance of multiple classification/feature selection algorithms
 \usage{
 doCV(logX, groupings, fs.methods = c("pamr", "scad", "rf_boruta"), DIR = "cv", 
 	seed = 123, ncv = 5, repeats = 10, jitter=FALSE, maxiter = 1000, maxevals = 500,
-	max_allowed_feat = 500, n.threshold = 50, maxRuns = 300)
+	max_allowed_feat = 500, n.threshold = 50, maxRuns = 300, params=NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -23,7 +23,7 @@ doCV(logX, groupings, fs.methods = c("pamr", "scad", "rf_boruta"), DIR = "cv",
 	1 for group A and -1 for group B). 
 }
   \item{fs.methods}{
-	A character vector naming the algorithms to be used. Currently, the following three algorithms are included: \code{pamr}, \code{scad}, \code{rf_boruta}. Any combination of these three can be used.
+	A character vector naming the algorithms to be used. Currently, the following three algorithms are included: \code{pamr}, \code{scad}, \code{rf_boruta}, \code{gbm}. Any combination of these three can be used.
 }
   \item{DIR}{
 	The output base directory.
@@ -57,9 +57,22 @@ doCV(logX, groupings, fs.methods = c("pamr", "scad", "rf_boruta"), DIR = "cv",
   \item{maxRuns}{
 	Parameter for Random Forest/Boruta from \code{Boruta} package.
 }
+  \item{params}{
+	List. Parameter list for the different methods. If NULL, a default object will be created, including the parameters \code{seed, ncv, repeats, jitter, maxiter, maxevals, max_allowed_feat, n.threshold and maxRuns}, as they are passed to \code{doCV}. Additionally, parameters for the boosting approach are specified. See details for more information.
+}
 }
 \details{
 	Use this function to evaluate the performance of classifying the groups assigned in \code{groupings} using classification algorithms defined in \code{fs.methods}. Performance is estimated in a crossvalidation with \code{ncv} folds and \code{repeats} repeats by generating ROC curves showing expected sensitivity and 1-specificity, as well as AUC.
+
+	The function argument \code{params} is a named list containing the parameters used for the different methods. In general, the arguments for each applied method can be specified. The following parameters can be specified, listed by the method:\cr
+	\describe{
+	\item{general parameters}{seed=123, ncv=5, repeats=10, jitter=FALSE}
+	\item{pamr}{max_allowed_feat=500, n.threshold=50}
+	\item{rf_boruta}{maxRuns=300}
+	\item{svmSCAD}{maxiter=1000, maxevals=500}
+	\item{gbm}{ntree=1000, shrinkage=0.01,interaction.depth=3,bag.fraction=0.75, train.fraction=0.75, n.minobsinnode=3,n.cores=1,verbose=TRUE}
+	}
+	
 }
 \value{
 	Output is stored in directory \code{DIR}.
