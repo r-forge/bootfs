@@ -68,7 +68,7 @@ function(X, Y, ncv=5, repeats=10, filename=NULL,
 				traing <- Y[seltrain]
 				## run svmscad
 				st <- system.time( 
-                        scad<- my.svm.fs(train, y=traing, fs.method=fs.method, bounds=bounds,
+                        scad<- svm.fs(train, y=traing, fs.method=fs.method, bounds=bounds,
 								lambda1.set=lambda1.scad, lambda2.set=lambda2.scad,
 								cross.outer= 0, grid.search = grid.search,  maxIter = maxiter, 
 								inner.val.method = "cv", cross.inner= 5, maxevals=maxevals,
@@ -113,7 +113,7 @@ function(X, Y, ncv=5, repeats=10, filename=NULL,
 				# 2nd plot: visited lambda points vs. cv errors
 				# 3rd plot: the same as the 2nd plot, Ytrain.exclude points are excluded. 
 				# The value cv.error = 10^16 stays for the cv error for an empty model ! 
-				penalizedSVM:::.plot.EPSGO.parms (scad$model$fit.info$Xtrain, scad$model$fit.info$Ytrain, bounds=bounds, Ytrain.exclude=10^16, plot.name=NULL )
+				.plot.EPSGO.parms (scad$model$fit.info$Xtrain, scad$model$fit.info$Ytrain, bounds=bounds, Ytrain.exclude=10^16, plot.name=NULL )
 			}
 		}
 		
