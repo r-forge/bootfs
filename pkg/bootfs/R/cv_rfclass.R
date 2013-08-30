@@ -100,8 +100,8 @@ function(X, logX, ncv=5, repeats=10, seed=123,
 					rfpred <- predict(randf, newdata=test, type="prob")
 					Ncl <- ncol(rfpred)
 					kx <- 0:Ncl * 2
-					argmax <- apply(rfpred, 1, function(x) which(x==max(x)))
-					allmax <- apply(rfpred, 1, max)
+					argmax <- unlist(apply(rfpred, 1, function(x) which(x==max(x))))
+					allmax <- unlist(apply(rfpred, 1, max))
 					randfpred <- kx[argmax] + allmax
 					# attach the prediction probability for the classes. Note that these are one probability for each class, i.e. a matrix with n.class columns for each fold/repeat
 					#fitted <- cbind(fitted, randfpred)

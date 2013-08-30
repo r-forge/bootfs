@@ -143,10 +143,10 @@ function(X, logX, ncv=5, repeats=10, seed=123, params,
 		title(main="ROC curves averaged over all CV runs")
 		roc_binterval(fitted, labels)
 	} else {
-		aucs <- vector("numeric", ncol(fitted))	
-		for(ki in 1:ncol(labels)) {
-			grpx <- labels[,ki]
-			predx <- fitted[,ki]
+		aucs <- vector("numeric", length(fitted))	
+		for(ki in 1:length(labels)) {
+			grpx <- labels[[ki]]
+			predx <- fitted[[ki]]
 			aucs[ki] <- multiclass.roc(grpx~predx)$auc
 		}
 		## plot auc distribution

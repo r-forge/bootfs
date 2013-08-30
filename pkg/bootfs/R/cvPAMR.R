@@ -81,13 +81,12 @@
 						yhat.rep <- c(yhat.rep, as.vector(obj$prob[fold, 2, thind]))
 						yreal.rep <- c(yreal.rep,as.numeric(as.character(obj$y))[fold])
 					}
-					
+					## combine the repeats in one single table
+					#yhat <- cbind(yhat, yhat.rep)
+					#yreal <- cbind(yreal, yreal.rep)
+					yhat[[it]] <- yhat.rep
+					yreal[[it]] <- yreal.rep					
 				}
-				## combine the repeats in one single table
-				#yhat <- cbind(yhat, yhat.rep)
-				#yreal <- cbind(yreal, yreal.rep)
-				yhat[[it]] <- yhat.rep
-				yreal[[it]] <- yreal.rep
 			}
 
 			if(distribution=="multinomial") {

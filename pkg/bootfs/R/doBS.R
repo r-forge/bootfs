@@ -9,7 +9,17 @@ doBS <- function(logX, groupings, ## data and grouping
 	## check if correct method namings are passed
 	stopifnot(all(fs.methods %in% c("pamr", "rf_boruta", "scad", "scad+L2", "1norm", "DrHSVM", "gbm")))
 	#stopifnot(require(ROCR))
-		
+
+	## check if applicable methods were requested for the type of classification problem
+	for(i in 1:length(groupings)) {
+		gx <- groupings[[i]]
+		if(length(unique(as.character(gx)))>2) {
+			if(!all(fs.methods %in% c("pamr", "rf_boruta", "gbm"))) {
+				stop("ERROR: Some of the classifications are multi-class. Only pamr, rf_boruta and gbm support multi-class classification so far. Please adjust your setting for fs.methods.")
+			}
+		}
+	}
+	
 	if(!file.exists(DIR))
 		dir.create(DIR)
 

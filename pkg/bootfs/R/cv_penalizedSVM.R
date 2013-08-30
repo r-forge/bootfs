@@ -105,16 +105,17 @@ function(X, Y, ncv=5, repeats=10, filename=NULL,
 		
 		## some diagnostic plots from penalized svm package
 		if(plotscaddiag) {
-			for(i in 1:length(fitlist)) {
-				scad <- fitlist[[i]]
-				# 						 
-				# create  3 plots on one screen: 
-				# 1st plot: distribution of initial points in tuning parameter space
-				# 2nd plot: visited lambda points vs. cv errors
-				# 3rd plot: the same as the 2nd plot, Ytrain.exclude points are excluded. 
-				# The value cv.error = 10^16 stays for the cv error for an empty model ! 
-				.plot.EPSGO.parms (scad$model$fit.info$Xtrain, scad$model$fit.info$Ytrain, bounds=bounds, Ytrain.exclude=10^16, plot.name=NULL )
-			}
+			print("Sorry, plotscaddiag is DEFUNCT and will be removed soon")
+#~ 			for(i in 1:length(fitlist)) {
+#~ 				scad <- fitlist[[i]]
+#~ 				# 						 
+#~ 				# create  3 plots on one screen: 
+#~ 				# 1st plot: distribution of initial points in tuning parameter space
+#~ 				# 2nd plot: visited lambda points vs. cv errors
+#~ 				# 3rd plot: the same as the 2nd plot, Ytrain.exclude points are excluded. 
+#~ 				# The value cv.error = 10^16 stays for the cv error for an empty model ! 
+#~ 				.plot.EPSGO.parms (scad$model$fit.info$Xtrain, scad$model$fit.info$Ytrain, bounds=bounds, Ytrain.exclude=10^16, plot.name=NULL )
+#~ 			}
 		}
 		
 		if(!is.null(filename)) {
