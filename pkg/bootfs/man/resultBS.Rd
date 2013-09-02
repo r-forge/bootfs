@@ -7,15 +7,15 @@ Summarise the results of a bootstrapping analysis.
 Get frequencies of features and importance graph by cobining all bootstrapping runs and classification methods.
 }
 \usage{
-resultBS(results, DIR=".", vlabel.cex = 3, filter = 10, saveres = TRUE, 
-		useresults=1:length(results))
+resultBS(results, DIR=NULL, vlabel.cex = 3, filter = 10, 
+		useresults=1:length(results), plot=TRUE)
 }
 \arguments{
   \item{results}{
 	Result object from \code{\link{doBS}}.
 }
   \item{DIR}{
-	Output base directory.
+	Output base directory. If not NULL, output is stored in this folder. Creates the following files: \code{importance_graph_combined.pdf}, \code{adj_sorted.csv} and \code{tophits.csv}.
 }
   \item{vlabel.cex}{
 	Node label expansion factor.
@@ -24,12 +24,11 @@ resultBS(results, DIR=".", vlabel.cex = 3, filter = 10, saveres = TRUE,
 	Edge occurrence filter. Only show edges with larger occurrence count
 	than \code{filter}.
 }
-  \item{saveres}{
-	Boolean. Should output be written and the importance graph saved in
-	directory \code{DIR}. Creates the following files: \code{importance_graph_combined.pdf}, \code{adj_sorted.csv} and \code{tophits.csv}.
-}
   \item{useresults}{
     Vector of integers. Specify the elements of the results list to use for summarisation. Defaults to all (i.e. use results from all feature selection algorithms).
+}
+  \item{plot}{
+	Boolean. If TRUE, show the importance graph plot.
 }
 }
 \details{

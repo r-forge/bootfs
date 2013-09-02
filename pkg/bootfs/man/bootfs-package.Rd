@@ -13,22 +13,21 @@ The package is intended as a convenient wrapper to multiple classification and f
 \tabular{ll}{
 Package: \tab bootfs\cr
 Type: \tab Package\cr
-%Version: \tab 1.0.3\cr
-%Date: \tab 2012-08-01\cr
 License: \tab GPL (>=2)\cr
 }
 The following methods are implemented:\cr
 SVM + SCAD: Support vector machines with Smoothly clipped absolute deviation feature selection (used from package \code{penalizedSVM}). Also, other models implemented in the penalizedSVM package can be used.\cr
 RF + Boruta: Random forests and Boruta feature selection.\cr
+RF: Random forest algorithm of Breiman.\cr
 PAMR: Prediction analysis for microarrays\cr
 GBM: Generalized boosting machine. \cr
 
+Note: DrHSVM method is slow and sometimes throws errors, so use with care.\cr
 }
 \author{
 Christian Bender
 
-Maintainer: Who to complain to <yourfault@somewhere.net>
-Christian Bender <christian.bender@tron-mainz.de>
+Maintainer: Christian Bender <christian.bender@tron-mainz.de>
 }
 \references{
 Boser, B.E., Guyon, I.M., Vapnik, V.N.:  A Training Algorithm for Optimal Margin Classifiers. Proceedings of the 5th Annual ACM Workshop on Computational Learning Theory, 1992.
@@ -47,9 +46,10 @@ Friedman, J. H.: Greedy function approximation: A gradient boosting machine. Ann
 }
 \keyword{ package }
 \seealso{
-\code{\link{doCV}}, \code{\link{doBS}}, \code{\link{resultBS}}, \code{\link{importance_igraph}}\cr
+\code{\link{control_params}}, \code{\link{doCV}}, \code{\link{doBS}}, \code{\link{resultBS}}, \code{\link{importance_igraph}}\cr
 Help for \code{penalizedSVM}\cr
 Help for \code{Boruta}\cr
+Help for \code{randomForest}\cr
 Help for \code{pamr}\cr
 Help for \code{gbm}\cr
 }
@@ -62,27 +62,29 @@ data <- simDataSet(nsam=30, ngen=100, sigma=2, plot=TRUE)
 logX <- data$logX
 groupings <- data$groupings
 
-#methods <- c("pamr", "scad", "rf_boruta")
-methods <- c("pamr", "gbm", "rf_boruta")
+## all methods:
+#methods <- c("pamr", "gbm", "rf_boruta", "rf", "scad", "DrHSVM", "1norm", "scad+L2")
+
+## selected methods
+methods <- c("pamr", "gbm", "rf")
 
 ## create a parameter object used for the different methods
 # for crossvalidation
-paramsCV <- list(seed=123,
-			ncv=5, repeats=10, jitter=FALSE,      ## general parameters
-			maxiter=100, maxevals=50,             ## scad parameters
-			max_allowed_feat=500, n.threshold=50, ## pamr parameters
-			maxRuns=300,                          ## RF parameters
-			ntree = 1000,                         ## GBM parameters
-			shrinkage = 0.01, interaction.depth = 3,
-			bag.fraction = 0.75, train.fraction = 0.75, 
-			n.minobsinnode = 3, n.cores = 1, 
-			verbose = TRUE
-)
-
+paramsCV <- control_params(seed=123,
+				ncv=5, repeats=10, jitter=FALSE,      ## general parameters
+				maxiter=100, maxevals=50,             ## svm parameters
+				max_allowed_feat=500, n.threshold=50, ## pamr parameters
+				maxRuns=300,                          ## RF parameters
+				ntree = 1000,                         ## GBM parameters
+				shrinkage = 0.01, interaction.depth = 3,
+				bag.fraction = 0.75, train.fraction = 0.75, 
+				n.minobsinnode = 3, n.cores = 1, 
+				verbose = TRUE)
+			
 # for bootstrapping
-paramsBS <- list(seed=1234,
+paramsBS <- control_params(seed=123,
 			jitter=FALSE, bstr=10,                  ## general parameters
-			maxiter=100, maxevals=50, bounds=NULL,  ## scad parameters
+			maxiter=100, maxevals=50, bounds=NULL,  ## svm parameters
 			max_allowed_feat=500, n.threshold=50,   ## pamr parameters
 			maxRuns=300,                            ## RF parameters
 			ntree = 1000,                           ## GBM parameters
@@ -96,7 +98,7 @@ paramsBS <- list(seed=1234,
 
 ## run the crossvalidation
 ## takes a while
-retCV <- doCV(logX, groupings, fs.methods = methods, DIR = "cv", params=paramsCV)
+retCV <- doCV(logX, groupings, fs.methods = methods, DIR = NULL, params=paramsCV)
 
 # old interface
 #retCV <- doCV(logX, groupings, fs.methods = methods, 
@@ -106,7 +108,7 @@ retCV <- doCV(logX, groupings, fs.methods = methods, DIR = "cv", params=paramsCV
 
 ## run the bootstrapping
 ## takes a while
-retBS <- doBS(logX, groupings, fs.methods=methods, DIR="bs", params=paramsBS)
+retBS <- doBS(logX, groupings, fs.methods=methods, DIR=NULL, params=paramsBS)
 
 # old interface
 #retBS <- doBS(logX, groupings, 
@@ -141,7 +143,7 @@ ig <- importance_igraph(res$adj, main = "my test",
 		node.color="grey", node.filter=NULL,
 		vlabel.cex=1.2, vlabel.cex.min=0.5, vlabel.cex.max=4,
 		max_node_cex=8,
-        edge.width=1, filter=1, max_edge_cex=2, ewprop=3 )
+        edge.width=1, edge.filter=1, max_edge_cex=2, ewprop=3 )
 
 
 ## show the data and groups
@@ -183,7 +185,7 @@ ig <- importance_igraph(res$adj, main = "my test",
 		node.color="grey", node.filter=NULL,
 		vlabel.cex=1.2, vlabel.cex.min=0.5, vlabel.cex.max=4,
 		max_node_cex=8,
-        edge.width=1, filter=1, max_edge_cex=2, ewprop=3 )
+        edge.width=1, edge.filter=1, max_edge_cex=2, ewprop=3 )
 
 
 

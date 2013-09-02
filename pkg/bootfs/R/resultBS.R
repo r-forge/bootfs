@@ -1,5 +1,7 @@
 ## get frequencies of features and importance graph for combination of methods
-resultBS <- function(results, DIR=".", vlabel.cex=3, filter=10, saveres=TRUE, useresults=1:length(results)) {
+resultBS <- function(results, DIR=NULL, vlabel.cex=3, filter=10, useresults=1:length(results), plot=TRUE) {
+	## save output to file
+	saveres <- !is.null(DIR)
 	## combine all signatures
 	strat <- names(results[[1]])[1]
 	bstr <- length(results[[1]][[1]])
@@ -55,7 +57,11 @@ resultBS <- function(results, DIR=".", vlabel.cex=3, filter=10, saveres=TRUE, us
         }
             #importance_igraph(detailed.to.simple.regulations(adj2), weights=adj2, 
             #main=strat, layout="layout.ellipsis", vlabel.cex=3, filter=filter, ewprop=3)
-        importance_igraph(adj2, main=strat, layout="layout.ellipsis", vlabel.cex=vlabel.cex, filter=filter, ewprop=3)
+
+		if(plot) {
+			importance_igraph(adj2, main=strat, layout="layout.ellipsis", vlabel.cex=vlabel.cex, edge.filter=filter, node.filter=filter, ewprop=3)
+		}
+		
         adjret <- adj2
         oo <- order(diag(adj2),decreasing=TRUE)
         adj2 <- adj2[oo,oo]

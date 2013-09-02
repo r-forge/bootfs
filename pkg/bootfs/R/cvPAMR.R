@@ -13,13 +13,18 @@
 		if(jitter) {
 			logX <- jitter(logX)
 		}
-		
-		SUBDIR <- paste(DIR,fs.method,sep="/")
-		if(!file.exists(SUBDIR))
-			dir.create(SUBDIR)
 
-		#X <- list(groupings=list(groupings, paste(SUBDIR, "groupings.pdf", sep="/")))
-		fnames <- paste(SUBDIR, "/", names(groupings), ".pdf", sep="")
+		if(!is.null(DIR)) {
+			SUBDIR <- paste(DIR,fs.method,sep="/")
+			if(!file.exists(SUBDIR))
+				dir.create(SUBDIR)
+			#X <- list(groupings=list(groupings, paste(SUBDIR, "groupings.pdf", sep="/")))
+			fnames <- paste(SUBDIR, "/", names(groupings), ".pdf", sep="")
+		} else {
+			SUBDIR <- NULL
+			fnames <- paste(names(groupings),".pdf",sep="")
+		}
+
 		X <- lapply(1:length(groupings), function(i,groupings,fnames) list(groupings[[i]], fnames[i]), groupings=groupings, fnames=fnames)
 		names(X) <- names(groupings)
 
@@ -33,11 +38,15 @@
 		## make the feature table
 		featlist <- sapply(resPAM, extract_feat_pam, SUBDIR=SUBDIR)
 
-		save(resPAM, X, logX, ncv, n.threshold, fs.method, SUBDIR, featlist, file=paste(SUBDIR, "env.RData", sep="/"))
-
+		if(!is.null(SUBDIR)) {
+			save(resPAM, X, logX, ncv, n.threshold, fs.method, SUBDIR, featlist, file=paste(SUBDIR, "env.RData", sep="/"))
+		}
+		
 		################################
 		## ROC Curves for PAM
-		pdf(paste(SUBDIR, "PAMR_ROC_Curves.pdf", sep="/")) #, width=10, height=10)
+		if(!is.null(SUBDIR)) {
+			pdf(paste(SUBDIR, "PAMR_ROC_Curves.pdf", sep="/")) #, width=10, height=10)
+		}
 		#par(mfrow=c(3,3))
 		for(i in 1:length(X)) {
 			## find the distribution type
@@ -116,7 +125,9 @@
 			}
 
 		}
-		dev.off()
+		if(!is.null(SUBDIR)) {
+			dev.off()
+		}
 
 		list(res=resPAM, featlist=featlist)
 	}

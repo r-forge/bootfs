@@ -15,6 +15,9 @@ function(X, logX, ncv=5, repeats=10, seed=123, params,
 	
 	Y <- X[[1]]
 	filename <- X[[2]]
+	## should something be plotted?
+	if(filename=="-")
+		filename <- NULL
 	nas <- which(is.na(Y))
 	if(length(nas)>0) {
 		x <- as.data.frame(logX[-nas,])
