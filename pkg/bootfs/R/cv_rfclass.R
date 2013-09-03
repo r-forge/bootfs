@@ -125,7 +125,10 @@ function(X, logX, ncv=5, repeats=10, seed=123,
 				rfpred <- predict(randf, newdata=test, type="prob")
 				Ncl <- ncol(rfpred)
 				kx <- 0:Ncl * 2
-				argmax <- unlist(apply(rfpred, 1, function(x) which(x==max(x))))
+				## sometimes more than one group is max. then choose randomly
+				#argmax <- unlist(apply(rfpred, 1, function(x) sample(which(x==max(x)))[1]))
+				## sometimes more than one group is max. then choose the first one
+				argmax <- unlist(apply(rfpred, 1, function(x) which(x==max(x))[1]))
 				allmax <- unlist(apply(rfpred, 1, max))
 				randfpred <- kx[argmax] + allmax
 				# attach the prediction probability for the classes. Note that these are one probability for each class, i.e. a matrix with n.class columns for each fold/repeat
@@ -138,6 +141,10 @@ function(X, logX, ncv=5, repeats=10, seed=123,
 				fitted[[it]] <- randfpred[,2]
 			}
 			#labels <- cbind(labels, testg)
+			if(length(testg) != length(fitted[[it]])) {
+				print("****************** OOPS: test vector not of equal length")
+				browser()
+			}
 			labels[[it]] <- testg
 			fitlist[[it]] <- randf # random forest on train dat with selected features
 			testlist[[it]] <- randfpred # corresponding prediction
@@ -166,6 +173,8 @@ function(X, logX, ncv=5, repeats=10, seed=123,
 		boxplot(aucs, ylim=c(0,1), main=c(paste(Ncl, "- class classification"), "multinomial model"))
 		axis(1, at=1, labels="multiclass AUC")
 		legend("bottomright", border="white", fill="white", legend=c("classes:",levels(Y)))
+		roc.curve <- NULL
+		auc <- signif(median(aucs,na.rm=TRUE), digits=3)
 	} else {
 		auc <- roc(as.vector(unlist(fitted)),as.vector(unlist(labels)),measure="tpr",x.measure="fpr",colorize=colorize, avg="none", spread.estimate="none", filter=0)
 		title(main="ROC curves averaged over all CV runs")	
@@ -173,13 +182,17 @@ function(X, logX, ncv=5, repeats=10, seed=123,
 		#title(main="ROC curves for each CV run")	#roc(as.vector(fitted),as.vector(labels),measure="tpr",x.measure="fpr",colorize=colorize, avg="none", spread.estimate="none", filter=0)
 		#title(main="ROC curves averaged over all CV runs")
 		roc_binterval(fitted, labels)
+		pred <- prediction(unlist(fitted), unlist(labels))
+		roc.curve <- performance(pred, measure = "tpr", x.measure = "fpr")
+		aucs <- unlist(performance(pred, "auc")@y.values)
 	}
 	if(!is.null(filename)) {
 		dev.off()
 	}
-
-	cvobj <- list(fitted=fitted, labels=labels, fitlist=fitlist, testlist=testlist, features=features, breslist=breslist)
-
+	performance <- list(fitted=fitted, labels=labels, aucs=aucs, auc=auc, roc.curve=roc.curve, classes=levels(Y))
+	## todo remove double saving of fitted and labels
+	cvobj <- list(fitlist=fitlist, testlist=testlist, features=features, breslist=breslist)
+	#cvobj <- list(fitted=fitted, labels=labels, fitlist=fitlist, testlist=testlist, features=features, breslist=breslist)
 
 	## train on all data
 	if(fs.method=="rf_boruta") {
@@ -213,5 +226,5 @@ function(X, logX, ncv=5, repeats=10, seed=123,
 	#~     dev.off()
 	err <- round(randf$err.rate[randf$ntree, "OOB"] * 100, digits = 2)
 	#err <- sum(rowSums(cbind(yp, as.numeric(as.character(predict(randf, x)))))==0)*100
-	list(bres=bres, randf=randf, selprobes=selprobes, err=err, cvobj=cvobj)
+	list(bres=bres, randf=randf, selprobes=selprobes, err=err, cvobj=cvobj, performance=performance)
 }

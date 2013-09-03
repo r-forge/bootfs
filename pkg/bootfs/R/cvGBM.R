@@ -52,6 +52,10 @@
 			resGBM <- lapply(X, cv_gbmclass, logX=logX, ncv=ncv, repeats=repeats, seed=seed, params=params)
 		}
 
+		## extract the performance objects
+		performance <- lapply(resGBM, function(x) x$performance)
+		names(performance) <- names(X)
+		
 		#rrr <- rfclass_cv(X[["groupings"]], logX=logX, ncv=ncv, repeats=repeats, seed=seed, maxRuns=maxRuns)
 		#resRF <- list(ttype=rrr)
 
@@ -61,5 +65,5 @@
 			save(resGBM, X, logX, fs.method, SUBDIR, featlist, file=paste(SUBDIR, "env.RData", sep="/"))
 		}
 
-		list(res=resGBM, featlist=featlist)
+		list(res=resGBM, featlist=featlist, performance=performance)
 	}

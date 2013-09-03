@@ -44,12 +44,16 @@ cvRFBORUTA <- function(logX, groupings, DIR, params=NULL) {
 
 	#rrr <- rfclass_cv(X[["groupings"]], logX=logX, ncv=ncv, repeats=repeats, seed=seed, maxRuns=maxRuns)
 	#resRF <- list(ttype=rrr)
-	
+
+	## extract the performance objects
+	performance <- lapply(resRF, function(x) x$performance)
+	names(performance) <- names(X)
+
 	## is this really needed? should probably not be written without asking...
 	featlist <- extract_features_rf_boruta(resRF, SUBDIR)
 	if(saveres & !is.null(SUBDIR)) {
 		save(resRF, X, logX, fs.method, rfimportance, ntree, localImp, SUBDIR, featlist, file=paste(SUBDIR, "env.RData", sep="/"))
 	}
 
-	list(res=resRF, featlist=featlist)
+	list(res=resRF, featlist=featlist, performance=performance)
 }

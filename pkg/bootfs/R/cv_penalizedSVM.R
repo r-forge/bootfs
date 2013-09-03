@@ -106,7 +106,10 @@ function(X, Y, ncv=5, repeats=10, filename=NULL,
 		#auc <- roc(fitted,labels,measure="tpr",x.measure="fpr",colorize=colorize, avg="threshold", spread.estimate="stddev", filter=1)
 		#title(main="ROC curves averaged over CV runs, with stddev")
 		roc_binterval(fitted, labels)
-		
+		pred <- prediction(unlist(fitted), unlist(labels))
+		roc.curve <- performance(pred, measure = "tpr", x.measure = "fpr")
+		aucs <- unlist(performance(pred, "auc")@y.values)
+
 		## some diagnostic plots from penalized svm package
 		if(plotscaddiag) {
 			print("Sorry, plotscaddiag is DEFUNCT and will be removed soon")
@@ -121,9 +124,13 @@ function(X, Y, ncv=5, repeats=10, filename=NULL,
 #~ 				.plot.EPSGO.parms (scad$model$fit.info$Xtrain, scad$model$fit.info$Ytrain, bounds=bounds, Ytrain.exclude=10^16, plot.name=NULL )
 #~ 			}
 		}
+		performance <- list(fitted=fitted, labels=labels, aucs=aucs, auc=auc, roc.curve=roc.curve, classes=levels(Y))
 		
 		if(!is.null(filename)) {
 			dev.off()
 		}
-		invisible(list(filename=filename, sn=sn, sp=sp, fitted=fitted, labels=labels, fitlist=fitlist, testlist=testlist, features=features, auc=auc, repeats=repeats, ncv=ncv))
+		## TODO: remove double saving of fitted, labels
+		retobj <- list(filename=filename, sn=sn, sp=sp, fitlist=fitlist, testlist=testlist, features=features, auc=auc, repeats=repeats, ncv=ncv, performance=performance)
+		#retobj <- list(filename=filename, sn=sn, sp=sp, fitted=fitted, labels=labels, fitlist=fitlist, testlist=testlist, features=features, auc=auc, repeats=repeats, ncv=ncv, performance=performance)
+		invisible(retobj)
 	}

@@ -37,9 +37,13 @@ cvSCAD <- function(logX, groupings, DIR, params=list(seed=123, ncv=5, repeats=10
 	allpr <- colnames(logX)
 	ffmat <- extract_feature_rankings(resSCAD, allpr, write=ifelse(is.null(SUBDIR), FALSE,  TRUE), DIR=SUBDIR)
 
+	## extract the performance objects
+	performance <- lapply(resSCAD, function(x) x$performance)
+	names(performance) <- names(X)
+
 	if(!is.null(SUBDIR)) {
 		save(resSCAD, allpr, ffmat, X, SUBDIR, logX, ncv, repeats, maxiter, maxevals, fs.method, file=paste(SUBDIR, "env.RData", sep="/"))
 	}
 
-	list(res=resSCAD, featlist=ffmat)
+	list(res=resSCAD, featlist=ffmat, performance=performance)
 }

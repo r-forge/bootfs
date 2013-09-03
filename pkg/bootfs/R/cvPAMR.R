@@ -47,6 +47,8 @@
 		if(!is.null(SUBDIR)) {
 			pdf(paste(SUBDIR, "PAMR_ROC_Curves.pdf", sep="/")) #, width=10, height=10)
 		}
+		## save the performance results in here
+		performance <- list()
 		#par(mfrow=c(3,3))
 		for(i in 1:length(X)) {
 			## find the distribution type
@@ -110,6 +112,8 @@
 				boxplot(aucs, ylim=c(0,1), main=c(paste(Ncl, "- class classification"), "multinomial model"))
 				axis(1, at=1, labels="multiclass AUC")
 				legend("bottomright", border="white", fill="white", legend=c("classes:",levels(Y)))
+				roc.curve <- NULL
+				auc <- signif(median(aucs,na.rm=TRUE),digits=3)
 			} else {
 				## make the roc curve
 				pred <- prediction(as.vector(unlist(yhat)), as.vector(unlist(yreal)))
@@ -123,11 +127,13 @@
 				plot(roc.curve, avg="none", spread.estimate="none", sub=paste("AUC:", auc), main=names(X)[i], lwd=2.5)
 				roc_binterval(yhat, yreal)
 			}
-
+			## save the aucs and the roc curve performance object
+			performance[[names(X)[i]]] <- list(fitted=yhat, labels=yreal, aucs=aucs, auc=auc, roc.curve=roc.curve, classes=levels(factor(clvec)))
 		}
 		if(!is.null(SUBDIR)) {
 			dev.off()
 		}
 
-		list(res=resPAM, featlist=featlist)
+		
+		list(res=resPAM, featlist=featlist, performance=performance)
 	}
