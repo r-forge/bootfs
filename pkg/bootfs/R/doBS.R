@@ -13,7 +13,10 @@ doBS <- function(logX, groupings, ## data and grouping
 	## check if applicable methods were requested for the type of classification problem
 	for(i in 1:length(groupings)) {
 		gx <- groupings[[i]]
-		if(length(unique(as.character(gx)))>2) {
+                gxu <- unique(as.character(gx))
+                gxu <- gxu[!is.na(gxu)]
+                gxu <- gxu[!gxu=="NA"]
+		if(length(gxu)>2) {
 			if(!all(fs.methods %in% c("pamr", "rf_boruta", "gbm", "rf"))) {
 				stop("ERROR: Some of the classifications are multi-class. Only pamr, rf_boruta and gbm support multi-class classification so far. Please adjust your setting for fs.methods.")
 			}
