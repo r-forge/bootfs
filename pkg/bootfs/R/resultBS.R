@@ -5,15 +5,21 @@ resultBS <- function(results, DIR=NULL, vlabel.cex=3, filter=10, useresults=1:le
 	N.groups <- unique(sapply(results, function(x) length(x)))
 	names.groups <- as.vector(unique(t(sapply(results, function(x) names(x)))))
 	print(paste("Found the following classfication groups:", paste(names.groups, collapse=", ")))
+
+	## save output to file
+	saveres <- !is.null(DIR)
 	
 	allresults <- results
 	ret <- list()
+
 	for(i.gr in 1:N.groups) {
 		grp <- names.groups[i.gr]
 		print(paste("Processing", grp, "..."))
-		SUBDIR <- paste(DIR, grp, sep="/")
-		if(!file.exists(SUBDIR))
-			dir.create(SUBDIR)
+		if(!is.null(DIR)) {
+			SUBDIR <- paste(DIR, grp, sep="/")
+			if(!file.exists(SUBDIR))
+				dir.create(SUBDIR)
+		}
 			
 		results <- list()
 		for(i.classif in 1:length(allresults)) {
@@ -24,8 +30,6 @@ resultBS <- function(results, DIR=NULL, vlabel.cex=3, filter=10, useresults=1:le
 		}
 	
 
-		## save output to file
-		saveres <- !is.null(DIR)
 		## combine all signatures
 		strat <- names(results[[1]])[1]
 		bstr <- length(results[[1]][[1]])

@@ -113,14 +113,14 @@ retBS <- doBS(logX, groupings, fs.methods=methods, DIR=NULL, params=paramsBS)
 # old interface
 #retBS <- doBS(logX, groupings, 
 #	fs.methods=methods,
-#	DIR="bs", 
+#	DIR=NULL, 
 #	seed=123, bstr=10, saveres=FALSE, jitter=FALSE,
 #	maxiter=100, maxevals=50, bounds=NULL,
 #	max_allowed_feat=NULL, n.threshold=50,
 #	maxRuns=30)
 
 ## only use one method
-#retBS <- doBS(logX, groupings, fs.methods=methods[1], DIR="bs", 
+#retBS <- doBS(logX, groupings, fs.methods=methods[1], DIR=NULL, 
 #	seed=123, bstr=2, saveres=FALSE, jitter=FALSE,	maxiter=20, 
 #	maxevals=20, bounds=NULL,max_allowed_feat=NULL, 
 #	n.threshold=25,maxRuns=10)
@@ -129,10 +129,10 @@ retBS <- doBS(logX, groupings, fs.methods=methods, DIR=NULL, params=paramsBS)
 ## and export the adjacency matrix containing the 
 ## numbers of occurrences of the features, as well 
 ## as the top hits.
-res <- resultBS(retBS, DIR="bs", vlabel.cex = 3, filter = 0, saveres = FALSE)
+res <- resultBS(retBS, DIR=NULL, vlabel.cex = 3, filter = 0, saveres = FALSE)
 
 ## only use methods 1 and 2
-res2 <- resultBS(retBS, DIR="bs", vlabel.cex = 3, filter = 0, saveres = FALSE, 
+res2 <- resultBS(retBS, DIR=NULL, vlabel.cex = 3, filter = 0, saveres = FALSE, 
 		useresults=1:2)
 
 
@@ -169,10 +169,10 @@ logX <- iris[,1:4]
 methods <- c("gbm","rf_boruta","pamr")
 
 ## crossvalidation
-retCV <- doCV(logX, groupings, fs.methods = methods, DIR = "cv_multi", params=paramsCV)
+retCV <- doCV(logX, groupings, fs.methods = methods, DIR = NULL, params=paramsCV)
 
 ## bootstrapped feature selection
-retBS <- doBS(logX, groupings, fs.methods=methods, DIR="bs_multi", params=paramsBS)
+retBS <- doBS(logX, groupings, fs.methods=methods, DIR=NULL, params=paramsBS)
 
 ## make results from all methods used
 res <- resultBS(retBS, DIR="bs_multi", vlabel.cex = 3, filter = 0, saveres = FALSE)
