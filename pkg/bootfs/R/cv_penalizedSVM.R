@@ -25,6 +25,15 @@ function(X, Y, ncv=5, repeats=10, filename=NULL,
 			X <- X[-nas,]
 			Y <- Y[-nas]
 		}
+		
+		## format such that binary vector is -1/1
+		if(!all(as.character(sort(levels(factor(datY))))==c("-1","1"))) {
+			datY <- ifelse(as.numeric(factor(datY))==1, -1, 1)
+		}
+		
+		## datY must be numeric
+		datY <- as.numeric(as.character(datY))
+
         ## somehow this is the only way how these methods are going to work
         grid.search <- "interval"
         lambda1.scad <- lambda2.scad <- NULL
