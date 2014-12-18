@@ -1,10 +1,10 @@
 Package: bootfs
 Type: Package
 Title: Use multiple feature selection algorithms to derive robust feature sets for two or multiclass classification problems.
-Version: 1.4.2
+Version: 1.4.3
 Date: 2012-08-01
 Author: Christian Bender
-Maintainer: Christian Bender <christian.bender@tron-mainz.de>
+Maintainer: Christian Bender <benderpkg@gmail.com>
 Description: To select a set of features used for successful classification of two or more groups of samples, multiple classification and feature selection algorithms are utilised. By combining the results of all methods and applying a bootstrapping approach a robust set of features with high power to distinguish the sample groups is selected.
 License: GPL (>=2)
 Depends: pROC
