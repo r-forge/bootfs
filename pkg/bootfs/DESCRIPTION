@@ -8,5 +8,4 @@ Maintainer: Christian Bender <benderpkg@gmail.com>
 Description: To select a set of features used for successful classification of two or more groups of samples, multiple classification and feature selection algorithms are utilised. By combining the results of all methods and applying a bootstrapping approach a robust set of features with high power to distinguish the sample groups is selected.
 License: GPL (>=2)
 Depends: pROC
-Imports: igraph, ROCR, gbm, colorRamps, gplots, gtools, pamr, randomForest, Boruta, caret, tgp, mlegp, penalizedSVM
-Suggests: parallel
+Imports: igraph, ROCR, gbm, colorRamps, gplots, gtools, pamr, randomForest, Boruta, caret, tgp, mlegp, penalizedSVM, parallel
