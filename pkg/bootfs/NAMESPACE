@@ -18,4 +18,10 @@ import( ROCR )
 import( gbm )
 import( pROC )
 import( parallel )
+importFrom("grDevices", "dev.off", "pdf")
+importFrom("graphics", "abline", "axis", "boxplot", "legend", "text",
+             "title")
+importFrom("stats", "as.dendrogram", "as.formula", "dist", "hclust",
+             "mad", "median", "predict", "quantile", "rnorm")
+importFrom("utils", "write.csv", "write.csv2")
 exportPattern("^[[:alpha:]]+")
