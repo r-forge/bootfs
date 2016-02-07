@@ -36,7 +36,8 @@ importance_igraph <- function (phi, main = "",
 	
 	## create the igraph object
 	ig <- graph.adjacency(phix)
-	ig.nodes <- as.matrix(print.igraph.vs(V(ig))) 
+	#ig.nodes <- as.matrix(print.igraph.vs(V(ig)))
+	ig.nodes <- as.matrix(as_ids(V(ig)))
 	if(tk) {
 		tkplot(ig, vertex.label=V(ig)$name)
 		return(ig)
@@ -54,16 +55,17 @@ importance_igraph <- function (phi, main = "",
 		vertex.color[match(snodes, ig.nodes)] <- "red"
 	}
 	if(!all(phix==0)) {
-		ig.edges <- gsub(" ","",as.matrix(print.igraph.es(E(ig))))
+		#ig.edges <- gsub(" ","",as.matrix(print(E(ig))))
+		ig.edges <- as_ids(E(ig))
 		edge.width <- rep(edge.width, length(ig.edges))
 		if(!is.null(weights)) {
             ## get edge width proportional to weights
-            epairs <- strsplit(ig.edges, "->")
+            #epairs <- strsplit(ig.edges, "->")
+			epairs <- strsplit(ig.edges, "\\|")
             for(epi in 1:length(epairs)) {
                 epair <- epairs[[epi]]
                 edge.width[epi] <- weights[epair[1], epair[2]]
-            }
-            
+            }  
 		}
 		
 		## attributes
